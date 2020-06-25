@@ -83,7 +83,7 @@ class Model_monet():
         self.gen_ba = Generator()
         self.gen_ba.eval()
         self.size = 524
-        self.gen_ba.load_state_dict(torch.load('pretrained_model/gen_ba80.pth'))
+        self.gen_ba.load_state_dict(torch.load('pretrained_model/gen_ba80.pth', map_location='cpu'))
 
         '''self.gen_ba = create_model(
             self.gen_ba,
