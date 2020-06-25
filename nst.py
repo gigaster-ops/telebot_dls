@@ -15,7 +15,7 @@ import gc
 import numpy as np
 import torchvision.utils as vutils
 
-device = torch.device("cuda")
+device = torch.device("cpu")
 
 imsize = 256  # use small size if no gpu
 
