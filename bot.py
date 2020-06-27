@@ -26,7 +26,7 @@ dp = Dispatcher(bot, storage=storage)
 users = {}
 
 model_monet = Model_monet()
-model_nst = nst_model()
+#model_nst = nst_model()
 gen_idx_ = gen_idx()
 
 
@@ -63,7 +63,7 @@ async def style_transfer_step_2(message: types.Message, state: FSMContext):
     await bot.send_photo(message.from_user.id,
                          types.input_file.InputFile('images/image_{}_{}_pre.jpg'.format(message['from']['id'], idx)))
 
-
+'''
 @dp.message_handler(commands=['style_transfer_nst'], state='*')
 async def nst(message: types.Message):
     await MyState.waiting_for_image_nst_1.set()
@@ -97,7 +97,7 @@ async def nst_step_3(message: types.Message, state: FSMContext):
 
     await bot.send_photo(message.from_user.id,
                          types.input_file.InputFile('images/image_{}_{}_pre.jpg'.format(message['from']['id'], idx)))
-
+'''
 
 @dp.message_handler(commands=['cancel'], state='*')
 async def cancel(message: types.Message, state: FSMContext):
