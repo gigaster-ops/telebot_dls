@@ -5,6 +5,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.utils.executor import start_webhook
+from aiogram.dispatcher.webhook import SendMessage
 
 from PIL import Image
 import time
@@ -44,13 +45,12 @@ gen_idx_ = gen_idx()
 
 @dp.message_handler(commands=['start'])
 async def start(message: types.Message):
-    print(message)
     await message.answer(write_start)
 
 
 @dp.message_handler(commands=['help'])
 async def help(message: types.Message):
-    await message.answer(write_help)
+    return SendMessage(message.chat.id, write_help)
 
 
 @dp.message_handler(commands=['style_transfer_monet'], state='*')
@@ -132,7 +132,16 @@ async def on_startup(dp):
 
 
 async def on_shutdown(dp):
-    pass
+
+    # insert code here to run it before shutdown
+
+    # Remove webhook (not acceptable in some cases)
+    await bot.delete_webhook()
+
+    # Close DB connection (if used)
+    await dp.storage.close()
+    await dp.storage.wait_closed()
+
 
 
 if __name__ == '__main__':
