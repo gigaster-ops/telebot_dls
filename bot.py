@@ -21,6 +21,17 @@ bot = Bot(token=TOKEN,
           proxy=proxy_host,
           proxy_auth=PROXY_AUTH)
 
+
+# webhook settings
+WEBHOOK_HOST = 'https://tgbotgigaster.herokuapp.com/'
+WEBHOOK_PATH = f'/webhook/{TOKEN}'
+WEBHOOK_URL = f"{WEBHOOK_HOST}{WEBHOOK_PATH}"
+
+# webserver settings
+WEBAPP_HOST = '0.0.0.0'  # or ip
+WEBAPP_PORT = 3001
+
+
 storage = MemoryStorage()
 dp = Dispatcher(bot, storage=storage)
 users = {}
@@ -113,6 +124,23 @@ async def cancel(message: types.Message, state: FSMContext):
 async def non(message: types.Message):
     await message.answer('Если вы хотите стилизовать изображение, то напишите мне одну из этих команд: \n' + write_help)
 
+
+async def on_startup(dp):
+    await bot.set_webhook(WEBHOOK_URL)
+    # insert code here to run it after start
+
+
+async def on_shutdown(dp):
+    pass
+
+
 if __name__ == '__main__':
-    executor.start_polling(dp)
-    print('Start!!!')
+    start_webhook(
+        dispatcher=dp,
+        webhook_path=WEBHOOK_PATH,
+        on_startup=on_startup,
+        on_shutdown=on_shutdown,
+        skip_updates=True,
+        host=WEBAPP_HOST,
+        port=WEBAPP_PORT,
+    )
