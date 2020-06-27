@@ -17,7 +17,7 @@ import torchvision.utils as vutils
 
 device = torch.device("cpu")
 
-imsize = 126  # use small size if no gpu
+imsize = 256  # use small size if no gpu
 
 loader = transforms.Compose([
     transforms.Resize((imsize, imsize)),  # scale imported image

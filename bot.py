@@ -4,8 +4,6 @@ import aiohttp
 from aiogram.dispatcher import FSMContext
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
-from aiogram.utils.executor import start_webhook
-from aiogram.dispatcher.webhook import SendMessage
 
 from PIL import Image
 import time
@@ -23,34 +21,24 @@ bot = Bot(token=TOKEN,
           proxy=proxy_host,
           proxy_auth=PROXY_AUTH)
 
-
-# webhook settings
-WEBHOOK_HOST = 'https://tgbotgigaster.herokuapp.com/'
-WEBHOOK_PATH = f'/webhook/{TOKEN}'
-WEBHOOK_URL = f"{WEBHOOK_HOST}{WEBHOOK_PATH}"
-
-# webserver settings
-WEBAPP_HOST = '0.0.0.0'  # or ip
-WEBAPP_PORT = 3001
-
-
 storage = MemoryStorage()
 dp = Dispatcher(bot, storage=storage)
 users = {}
 
 model_monet = Model_monet()
-#model_nst = nst_model()
+model_nst = nst_model()
 gen_idx_ = gen_idx()
 
 
 @dp.message_handler(commands=['start'])
 async def start(message: types.Message):
+    print(message)
     await message.answer(write_start)
 
 
 @dp.message_handler(commands=['help'])
 async def help(message: types.Message):
-    return SendMessage(message.chat.id, write_help)
+    await message.answer(write_help)
 
 
 @dp.message_handler(commands=['style_transfer_monet'], state='*')
@@ -68,14 +56,14 @@ async def style_transfer_step_2(message: types.Message, state: FSMContext):
         proxy.clear()
 
     idx = gen_idx_.__next__()
-    await message.photo[-1].download('image_{}_{}.jpg'.format(message['from']['id'], idx))
+    await message.photo[-1].download('images/image_{}_{}.jpg'.format(message['from']['id'], idx))
 
-    await model_monet.predict('image_{}_{}'.format(message['from']['id'], idx))
+    await model_monet.predict('images/image_{}_{}'.format(message['from']['id'], idx))
 
     await bot.send_photo(message.from_user.id,
-                         types.input_file.InputFile('image_{}_{}_pre.jpg'.format(message['from']['id'], idx)))
+                         types.input_file.InputFile('images/image_{}_{}_pre.jpg'.format(message['from']['id'], idx)))
 
-'''
+
 @dp.message_handler(commands=['style_transfer_nst'], state='*')
 async def nst(message: types.Message):
     await MyState.waiting_for_image_nst_1.set()
@@ -109,7 +97,7 @@ async def nst_step_3(message: types.Message, state: FSMContext):
 
     await bot.send_photo(message.from_user.id,
                          types.input_file.InputFile('images/image_{}_{}_pre.jpg'.format(message['from']['id'], idx)))
-'''
+
 
 @dp.message_handler(commands=['cancel'], state='*')
 async def cancel(message: types.Message, state: FSMContext):
@@ -125,32 +113,6 @@ async def cancel(message: types.Message, state: FSMContext):
 async def non(message: types.Message):
     await message.answer('Если вы хотите стилизовать изображение, то напишите мне одну из этих команд: \n' + write_help)
 
-
-async def on_startup(dp):
-    await bot.set_webhook(WEBHOOK_URL)
-    # insert code here to run it after start
-
-
-async def on_shutdown(dp):
-
-    # insert code here to run it before shutdown
-
-    # Remove webhook (not acceptable in some cases)
-    await bot.delete_webhook()
-
-    # Close DB connection (if used)
-    await dp.storage.close()
-    await dp.storage.wait_closed()
-
-
-
 if __name__ == '__main__':
-    start_webhook(
-        dispatcher=dp,
-        webhook_path=WEBHOOK_PATH,
-        on_startup=on_startup,
-        on_shutdown=on_shutdown,
-        skip_updates=True,
-        host=WEBAPP_HOST,
-        port=WEBAPP_PORT,
-    )
+    executor.start_polling(dp)
+    print('Start!!!')
