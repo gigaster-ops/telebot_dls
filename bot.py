@@ -4,6 +4,7 @@ import aiohttp
 from aiogram.dispatcher import FSMContext
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
+from aiogram.utils.executor import start_webhook
 
 from PIL import Image
 import time
