@@ -56,12 +56,12 @@ async def style_transfer_step_2(message: types.Message, state: FSMContext):
         proxy.clear()
 
     idx = gen_idx_.__next__()
-    await message.photo[-1].download('images/image_{}_{}.jpg'.format(message['from']['id'], idx))
+    await message.photo[-1].download('image_{}_{}.jpg'.format(message['from']['id'], idx))
 
-    await model_monet.predict('images/image_{}_{}'.format(message['from']['id'], idx))
+    await model_monet.predict('image_{}_{}'.format(message['from']['id'], idx))
 
     await bot.send_photo(message.from_user.id,
-                         types.input_file.InputFile('images/image_{}_{}_pre.jpg'.format(message['from']['id'], idx)))
+                         types.input_file.InputFile('image_{}_{}_pre.jpg'.format(message['from']['id'], idx)))
 
 '''
 @dp.message_handler(commands=['style_transfer_nst'], state='*')
